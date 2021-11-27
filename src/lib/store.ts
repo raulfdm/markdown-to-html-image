@@ -32,7 +32,9 @@ export const formMachine = createMachine(
         on: {
           FOCUS_MARKDOWN: 'markdown',
           FOCUS_URL: 'url',
-          FOCUS_ALT: 'alt'
+          FOCUS_ALT: 'alt',
+          FOCUS_WIDTH: 'width',
+          FOCUS_HEIGHT: 'height'
         }
       },
       markdown: {
@@ -61,8 +63,25 @@ export const formMachine = createMachine(
             target: 'alt',
             actions: ['updateAlt']
           }
-        },
-        exit: []
+        }
+      },
+      width: {
+        on: {
+          LOST_FOCUS: 'idle',
+          INPUT_CHANGE: {
+            target: 'width',
+            actions: ['updateWidth']
+          }
+        }
+      },
+      height: {
+        on: {
+          LOST_FOCUS: 'idle',
+          INPUT_CHANGE: {
+            target: 'height',
+            actions: ['updateHeight']
+          }
+        }
       }
     }
   },
@@ -74,9 +93,6 @@ export const formMachine = createMachine(
         },
         markdown: (ctx, event: { value: string; type: string }) => {
           return `![${ctx.alt}](${event.value})`;
-        },
-        html: (ctx, event: { value: string; type: string }) => {
-          return `<img src="${event.value}" alt="${ctx.alt}" />`;
         }
       }),
       updateAlt: assign({
@@ -125,6 +141,12 @@ export const formMachine = createMachine(
 
           return '';
         }
+      }),
+      updateWidth: assign({
+        width: (ctx, event: { value: string; type: string }) => event.value
+      }),
+      updateHeight: assign({
+        height: (ctx, event: { value: string; type: string }) => event.value
       })
     }
   }

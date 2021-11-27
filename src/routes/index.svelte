@@ -24,6 +24,7 @@
     <div>
       <h3 class="mb-2">Markdown</h3>
       <TextArea
+        value={$state.context.markdown}
         on:focus={() => send('FOCUS_MARKDOWN')}
         on:input={(e) => {
           send('INPUT_CHANGE', { value: e.target.value });
@@ -71,11 +72,27 @@
       </fieldset>
       <fieldset class="col-span-6 grid grid-cols-12">
         <label for="" class="col-span-2 flex items-center">Width</label>
-        <input type="number" bind:value={$store.width} class="col-span-10" />
+        <input
+          type="number"
+          class="col-span-10"
+          on:focus={() => send('FOCUS_WIDTH')}
+          on:input={(e) => {
+            send('INPUT_CHANGE', { value: e.target.value });
+          }}
+          on:blur={() => send('LOST_FOCUS')}
+        />
       </fieldset>
       <fieldset class="col-span-6 grid grid-cols-12">
         <label for="" class="col-span-2 flex items-center">Height</label>
-        <input type="number" bind:value={$store.height} class="col-span-10" />
+        <input
+          type="number"
+          class="col-span-10"
+          on:focus={() => send('FOCUS_HEIGHT')}
+          on:input={(e) => {
+            send('INPUT_CHANGE', { value: e.target.value });
+          }}
+          on:blur={() => send('LOST_FOCUS')}
+        />
       </fieldset>
     </div>
   </div>
