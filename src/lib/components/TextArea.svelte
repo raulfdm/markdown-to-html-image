@@ -1,4 +1,8 @@
-<textarea cols="35" rows="2" {...$$props}></textarea>
+<script>
+  export let value = '';
+</script>
+
+<textarea cols="35" rows="2" bind:value on:input {...$$restProps}></textarea>
 
 <style lang="postcss">
   textarea {

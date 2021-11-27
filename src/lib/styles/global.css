@@ -15,3 +15,7 @@ body {
   background-color: hsl(210deg, 30%, 8%);
   @apply text-gray-100;
 }
+
+img {
+  height: unset;
+}

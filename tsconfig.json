@@ -26,10 +26,10 @@
 		"allowJs": true,
 		"checkJs": true,
 		"paths": {
-			"~/lib": [
+			"$lib": [
 				"src/lib"
 			],
-			"~/lib/*": [
+			"$lib/*": [
 				"src/lib/*"
 			]
 		}
