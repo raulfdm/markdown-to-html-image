@@ -70,37 +70,13 @@
   //   return alt;
   // }
 
-  // function getHtmlString({ width, height }) {
-  //   return `<img src="${url}" alt="${alt}" ${width ? `width="${width}"` : ''} ${
-  //     height ? `height="${height}"` : ''
-  //   } />`;
-  // }
-
-  // function handleMarkdownChange(v) {
-
-  // }
-
-  // function handleUrl(value: string) {
-  //   actions.setUrl(value);
-  // }
-
-  function handleMarkdownChange(event: InputEvent) {
-    const nextUrl = getUrl((event.target as HTMLInputElement).value);
-
-    if (nextUrl) {
-      actions.setUrl(nextUrl);
-    }
+  function getHtml(state) {
+    return `<img src="${state.context.url}" alt="${state.context.alt}" ${
+      state.context.width ? `width="${state.context.width}"` : ''
+    } ${state.context.height ? `height="${state.context.height}"` : ''} />`;
   }
 
-  let htmlString = derived(store, ($store) => {
-    const { url, alt } = $store;
-    return `<img src="${url}" alt="${alt}" />`;
-  });
-
-  let markdownText = derived(store, ($store) => {
-    const { url, alt } = $store;
-    return `![${alt}](${url})`;
-  });
+  $: htmlString = getHtml($state);
 </script>
 
 <main class="container max-w-screen-md mx-auto h-screen">
@@ -114,7 +90,7 @@
 
     <div class="mt-4">
       <h3 class="mb-2">HTML</h3>
-      <TextArea value={$state.context.html} disabled />
+      <TextArea value={htmlString} disabled />
     </div>
   </div>
 
