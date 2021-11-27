@@ -22,7 +22,6 @@ export const formMachine = createMachine(
     initial: 'idle',
     context: {
       markdown: '![]()',
-      html: '<img src="" alt="" />',
       url: '',
       alt: '',
       width: undefined,
@@ -37,8 +36,13 @@ export const formMachine = createMachine(
         }
       },
       markdown: {
-        on: { LOST_FOCUS: 'idle' },
-        exit: ['updateAlt', 'updateUrl', 'updateHtmlUrl', 'updateHtmlAlt']
+        on: {
+          LOST_FOCUS: 'idle',
+          INPUT_CHANGE: {
+            target: 'markdown',
+            actions: 'updateMarkdown'
+          }
+        }
       },
       url: {
         on: {
@@ -81,23 +85,47 @@ export const formMachine = createMachine(
         },
         markdown: (ctx, event: { value: string; type: string }) => {
           return `![${event.value}](${ctx.url})`;
-        },
-        html: (ctx, event: { value: string; type: string }) => {
-          return `<img src="${ctx.url}" alt="${event.value}" />`;
         }
       }),
-      updateMarkdownUrl(context, event) {
-        console.log('UPDATE Markdown URL');
-      },
-      updateMarkdownAlt(context, event) {
-        console.log('UPDATE Markdown ALT');
-      },
-      updateHtmlUrl(context, event) {
-        console.log('UPDATE HTML URL');
-      },
-      updateHtmlAlt(context, event) {
-        console.log('UPDATE HTML ALT');
-      }
+      updateMarkdown: assign({
+        markdown: (ctx, event: { value: string; type: string }) => {
+          return event.value;
+        },
+        url: (ctx, event: { value: string; type: string }) => {
+          if (!event.value) {
+            return ctx.url;
+          }
+
+          const REGEX_ULR = /\((.*)\)/;
+          const result = event.value.match(REGEX_ULR);
+
+          if (result === null) {
+            return ctx.url;
+          }
+
+          const [_, url] = result;
+
+          return url;
+        },
+        alt: (ctx, event: { value: string; type: string }) => {
+          if (!event.value) {
+            return ctx.alt;
+          }
+
+          const REGEX_ALT = /\[(.*)\]/;
+          const result = event.value.match(REGEX_ALT);
+
+          if (result === null) {
+            return ctx.alt;
+          }
+
+          const [_, alt] = result;
+
+          return alt;
+
+          return '';
+        }
+      })
     }
   }
 );

@@ -2,73 +2,11 @@
   import TextArea from '$lib/components/TextArea.svelte';
   import { useMachine } from '$lib/hooks/useMachine';
   import { store, actions, formMachine } from '$lib/store';
-  // import { store, actions } from '$lib/';
 
   import { derived } from 'svelte/store';
   import { log } from 'xstate/lib/actions';
 
   const { send, state } = useMachine(formMachine, {});
-
-  $: {
-    console.log($state.context);
-  }
-
-  // let markdownText = '';
-  // $: url = getUrl(markdownText);
-  // $: alt = getAlt(markdownText);
-
-  // let width = undefined;
-  // let height = undefined;
-
-  // $: htmlString = getHtmlString({ width, height, url, alt });
-
-  // derived(store, ($store) => {
-  //   console.log($store);
-  // });
-  // $: {
-  //   // console.log(url);
-  //   // console.log(alt);
-  // }
-
-  // function updateMarkdown() {
-  //   const nextUrl = Boolean(url) ? url : '';
-  //   const nextAlt = Boolean(alt) ? alt : '';
-  //   return `![${nextAlt}](${nextUrl})`;
-  // }
-
-  function getUrl(txt: string) {
-    if (!txt) {
-      return '';
-    }
-
-    const REGEX_ULR = /\((.*)\)/;
-    const result = txt.match(REGEX_ULR);
-
-    if (result === null) {
-      return '';
-    }
-
-    const [_, url] = result;
-
-    return url;
-  }
-
-  // function getAlt() {
-  //   if (!markdownText) {
-  //     return '';
-  //   }
-
-  //   const REGEX_ALT = /\[(.*)\]/;
-  //   const result = markdownText.match(REGEX_ALT);
-
-  //   if (result === null) {
-  //     return '';
-  //   }
-
-  //   const [_, alt] = result;
-
-  //   return alt;
-  // }
 
   function getHtml(state) {
     return `<img src="${state.context.url}" alt="${state.context.alt}" ${
@@ -85,7 +23,13 @@
   <div class="flex flex-col justify-between">
     <div>
       <h3 class="mb-2">Markdown</h3>
-      <TextArea value={$state.context.markdown} on:input={handleMarkdownChange} />
+      <TextArea
+        on:focus={() => send('FOCUS_MARKDOWN')}
+        on:input={(e) => {
+          send('INPUT_CHANGE', { value: e.target.value });
+        }}
+        on:blur={() => send('LOST_FOCUS')}
+      />
     </div>
 
     <div class="mt-4">
@@ -104,6 +48,7 @@
         <input
           type="text"
           class="col-span-11"
+          value={$state.context.url}
           on:focus={() => send('FOCUS_URL')}
           on:input={(e) => {
             send('INPUT_CHANGE', { value: e.target.value });
@@ -116,6 +61,7 @@
         <input
           type="text"
           class="col-span-11"
+          value={$state.context.alt}
           on:focus={() => send('FOCUS_ALT')}
           on:input={(e) => {
             send('INPUT_CHANGE', { value: e.target.value });

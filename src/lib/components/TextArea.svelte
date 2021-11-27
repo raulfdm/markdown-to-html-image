@@ -2,7 +2,7 @@
   export let value = '';
 </script>
 
-<textarea cols="35" rows="2" bind:value on:input {...$$restProps}></textarea>
+<textarea cols="35" rows="2" bind:value on:input on:focus on:blur {...$$restProps} />
 
 <style lang="postcss">
   textarea {
