@@ -1,22 +1,43 @@
-import { writable } from 'svelte/store';
 import { createMachine, assign } from 'xstate';
+import type { Event, SingleOrArray } from 'xstate';
 
-export const store = writable({
-  url: '',
-  alt: '',
-  height: undefined,
-  width: undefined
-});
+type FormEvents =
+  | { type: 'FOCUS_MARKDOWN' }
+  | { type: 'FOCUS_URL' }
+  | { type: 'FOCUS_ALT' }
+  | { type: 'FOCUS_WIDTH' }
+  | { type: 'FOCUS_HEIGHT' }
+  | { type: 'LOST_FOCUS' }
+  | { type: 'INPUT_CHANGE'; value: string };
 
-export const actions = {
-  setUrl: (url: string) => {
-    store.update((store) => {
-      return { ...store, url };
-    });
-  }
+interface FormContext {
+  markdown: string;
+  url: string;
+  alt: string;
+  width: string | undefined;
+  height: string | undefined;
+}
+
+const FORM_STATES = {
+  idle: 'idle',
+  markdown: 'markdown',
+  url: 'url',
+  alt: 'alt',
+  width: 'width',
+  height: 'height'
 };
 
-export const formMachine = createMachine(
+const FORM_EVENTS = {
+  focusMarkdown: 'FOCUS_MARKDOWN',
+  focusUrl: 'FOCUS_URL',
+  focusAlt: 'FOCUS_ALT',
+  focusWidth: 'FOCUS_WIDTH',
+  focusHeight: 'FOCUS_HEIGHT',
+  lostFocus: 'LOST_FOCUS',
+  inputChange: 'INPUT_CHANGE'
+};
+
+export const formMachine = createMachine<FormContext, FormEvents>(
   {
     id: 'form',
     initial: 'idle',
@@ -28,57 +49,56 @@ export const formMachine = createMachine(
       height: undefined
     },
     states: {
-      idle: {
+      [FORM_STATES.idle]: {
         on: {
-          FOCUS_MARKDOWN: 'markdown',
-          FOCUS_URL: 'url',
-          FOCUS_ALT: 'alt',
-          FOCUS_WIDTH: 'width',
-          FOCUS_HEIGHT: 'height'
+          [FORM_EVENTS.focusMarkdown]: FORM_STATES.markdown,
+          [FORM_EVENTS.focusUrl]: FORM_STATES.url,
+          [FORM_EVENTS.focusAlt]: FORM_STATES.alt,
+          [FORM_EVENTS.focusWidth]: FORM_STATES.width,
+          [FORM_EVENTS.focusHeight]: FORM_STATES.height
         }
       },
-      markdown: {
+      [FORM_STATES.markdown]: {
         on: {
-          LOST_FOCUS: 'idle',
-          INPUT_CHANGE: {
-            target: 'markdown',
-            actions: 'updateMarkdown'
+          [FORM_EVENTS.lostFocus]: FORM_STATES.idle,
+          [FORM_EVENTS.inputChange]: {
+            target: FORM_STATES.markdown,
+            actions: ['updateMarkdown']
           }
         }
       },
-      url: {
+      [FORM_STATES.url]: {
         on: {
-          LOST_FOCUS: 'idle',
-          INPUT_CHANGE: {
-            target: 'url',
+          [FORM_EVENTS.lostFocus]: FORM_STATES.idle,
+          [FORM_EVENTS.inputChange]: {
+            target: FORM_STATES.url,
             actions: ['updateUrl']
           }
-        },
-        exit: []
+        }
       },
-      alt: {
+      [FORM_STATES.alt]: {
         on: {
-          LOST_FOCUS: 'idle',
-          INPUT_CHANGE: {
-            target: 'alt',
+          [FORM_EVENTS.lostFocus]: FORM_STATES.idle,
+          [FORM_EVENTS.inputChange]: {
+            target: FORM_STATES.alt,
             actions: ['updateAlt']
           }
         }
       },
-      width: {
+      [FORM_STATES.width]: {
         on: {
-          LOST_FOCUS: 'idle',
-          INPUT_CHANGE: {
-            target: 'width',
+          [FORM_EVENTS.lostFocus]: FORM_STATES.idle,
+          [FORM_EVENTS.inputChange]: {
+            target: FORM_STATES.width,
             actions: ['updateWidth']
           }
         }
       },
-      height: {
+      [FORM_STATES.height]: {
         on: {
-          LOST_FOCUS: 'idle',
-          INPUT_CHANGE: {
-            target: 'height',
+          [FORM_EVENTS.lostFocus]: FORM_STATES.idle,
+          [FORM_EVENTS.inputChange]: {
+            target: FORM_STATES.height,
             actions: ['updateHeight']
           }
         }
@@ -88,26 +108,32 @@ export const formMachine = createMachine(
   {
     actions: {
       updateUrl: assign({
-        url: (ctx, event: { value: string; type: string }) => {
+        url: (_, event) => {
+          if (event.type !== 'INPUT_CHANGE') return;
           return event.value;
         },
-        markdown: (ctx, event: { value: string; type: string }) => {
+        markdown: (ctx, event) => {
+          if (event.type !== 'INPUT_CHANGE') return;
           return `![${ctx.alt}](${event.value})`;
         }
       }),
       updateAlt: assign({
-        alt: (ctx, event: { value: string; type: string }) => {
+        alt: (_, event) => {
+          if (event.type !== 'INPUT_CHANGE') return;
           return event.value;
         },
-        markdown: (ctx, event: { value: string; type: string }) => {
+        markdown: (ctx, event) => {
+          if (event.type !== 'INPUT_CHANGE') return;
           return `![${event.value}](${ctx.url})`;
         }
       }),
       updateMarkdown: assign({
-        markdown: (ctx, event: { value: string; type: string }) => {
+        markdown: (ctx, event) => {
+          if (event.type !== 'INPUT_CHANGE') return;
           return event.value;
         },
-        url: (ctx, event: { value: string; type: string }) => {
+        url: (ctx, event) => {
+          if (event.type !== 'INPUT_CHANGE') return;
           if (!event.value) {
             return ctx.url;
           }
@@ -123,7 +149,8 @@ export const formMachine = createMachine(
 
           return url;
         },
-        alt: (ctx, event: { value: string; type: string }) => {
+        alt: (ctx, event) => {
+          if (event.type !== 'INPUT_CHANGE') return;
           if (!event.value) {
             return ctx.alt;
           }
@@ -143,11 +170,21 @@ export const formMachine = createMachine(
         }
       }),
       updateWidth: assign({
-        width: (ctx, event: { value: string; type: string }) => event.value
+        width: (_, event) => {
+          if (event.type !== 'INPUT_CHANGE') return;
+          return event.value;
+        }
       }),
       updateHeight: assign({
-        height: (ctx, event: { value: string; type: string }) => event.value
+        height: (_, event) => {
+          if (event.type !== 'INPUT_CHANGE') return;
+          return event.value;
+        }
       })
     }
   }
 );
+
+export type FormStateMachine = typeof formMachine;
+
+export type IFormEvent = SingleOrArray<Event<FormEvents>>;

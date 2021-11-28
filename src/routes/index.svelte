@@ -1,17 +1,30 @@
 <script lang="ts">
   import TextArea from '$lib/components/TextArea.svelte';
   import { useMachine } from '$lib/hooks/useMachine';
-  import { store, actions, formMachine } from '$lib/store';
+  import { formMachine, IFormEvent } from '$lib/store';
 
-  import { derived } from 'svelte/store';
-  import { log } from 'xstate/lib/actions';
-
-  const { send, state } = useMachine(formMachine, {});
+  const { send, state } = useMachine(formMachine);
 
   function getHtml(state) {
     return `<img src="${state.context.url}" alt="${state.context.alt}" ${
       state.context.width ? `width="${state.context.width}"` : ''
     } ${state.context.height ? `height="${state.context.height}"` : ''} />`;
+  }
+
+  function handleInput(event: Event) {
+    const target = event.target as HTMLInputElement;
+
+    send('INPUT_CHANGE', { value: target.value });
+  }
+
+  function handleBlur() {
+    send('LOST_FOCUS');
+  }
+
+  function handleFocus(event: IFormEvent) {
+    return () => {
+      send(event);
+    };
   }
 
   $: htmlString = getHtml($state);
@@ -25,11 +38,9 @@
       <h3 class="mb-2">Markdown</h3>
       <TextArea
         value={$state.context.markdown}
-        on:focus={() => send('FOCUS_MARKDOWN')}
-        on:input={(e) => {
-          send('INPUT_CHANGE', { value: e.target.value });
-        }}
-        on:blur={() => send('LOST_FOCUS')}
+        on:focus={handleFocus('FOCUS_MARKDOWN')}
+        on:input={handleInput}
+        on:blur={handleBlur}
       />
     </div>
 
@@ -50,11 +61,9 @@
           type="text"
           class="col-span-11"
           value={$state.context.url}
-          on:focus={() => send('FOCUS_URL')}
-          on:input={(e) => {
-            send('INPUT_CHANGE', { value: e.target.value });
-          }}
-          on:blur={() => send('LOST_FOCUS')}
+          on:focus={handleFocus('FOCUS_URL')}
+          on:input={handleInput}
+          on:blur={handleBlur}
         />
       </fieldset>
       <fieldset class="col-span-12 grid grid-cols-12">
@@ -63,11 +72,9 @@
           type="text"
           class="col-span-11"
           value={$state.context.alt}
-          on:focus={() => send('FOCUS_ALT')}
-          on:input={(e) => {
-            send('INPUT_CHANGE', { value: e.target.value });
-          }}
-          on:blur={() => send('LOST_FOCUS')}
+          on:focus={handleFocus('FOCUS_ALT')}
+          on:input={handleInput}
+          on:blur={handleBlur}
         />
       </fieldset>
       <fieldset class="col-span-6 grid grid-cols-12">
@@ -75,11 +82,9 @@
         <input
           type="number"
           class="col-span-10"
-          on:focus={() => send('FOCUS_WIDTH')}
-          on:input={(e) => {
-            send('INPUT_CHANGE', { value: e.target.value });
-          }}
-          on:blur={() => send('LOST_FOCUS')}
+          on:focus={handleFocus('FOCUS_WIDTH')}
+          on:input={handleInput}
+          on:blur={handleBlur}
         />
       </fieldset>
       <fieldset class="col-span-6 grid grid-cols-12">
@@ -87,11 +92,9 @@
         <input
           type="number"
           class="col-span-10"
-          on:focus={() => send('FOCUS_HEIGHT')}
-          on:input={(e) => {
-            send('INPUT_CHANGE', { value: e.target.value });
-          }}
-          on:blur={() => send('LOST_FOCUS')}
+          on:focus={handleFocus('FOCUS_HEIGHT')}
+          on:input={handleInput}
+          on:blur={handleBlur}
         />
       </fieldset>
     </div>
