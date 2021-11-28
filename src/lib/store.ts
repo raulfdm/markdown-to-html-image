@@ -42,11 +42,11 @@ export const formMachine = createMachine<FormContext, FormEvents>(
     id: 'form',
     initial: 'idle',
     context: {
-      markdown: '![]()',
-      url: '',
-      alt: '',
-      width: undefined,
-      height: undefined
+      markdown: '![Random Image from Picsum](https://picsum.photos/200/300)',
+      url: 'https://picsum.photos/200/300',
+      alt: 'Random Image from Picsum',
+      width: '200',
+      height: '300'
     },
     states: {
       [FORM_STATES.idle]: {

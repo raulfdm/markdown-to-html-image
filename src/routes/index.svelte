@@ -83,6 +83,7 @@
         <input
           type="number"
           class="col-span-12"
+          value={$state.context.width}
           on:focus={handleFocus('FOCUS_WIDTH')}
           on:input={handleInput}
           on:blur={handleBlur}
@@ -93,6 +94,7 @@
         <input
           type="number"
           class="col-span-12"
+          value={$state.context.height}
           on:focus={handleFocus('FOCUS_HEIGHT')}
           on:input={handleInput}
           on:blur={handleBlur}
