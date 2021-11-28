@@ -1,12 +1,14 @@
-<script>
+<script lang="ts">
   export let value = '';
+  export let ref: HTMLTextAreaElement = null;
 </script>
 
-<textarea cols="35" rows="2" bind:value on:input on:focus on:blur {...$$restProps} />
+<textarea bind:value on:input on:focus on:blur bind:this={ref} rows={3} {...$$restProps} />
 
 <style lang="postcss">
   textarea {
     background-color: hsl(210deg 31% 27%);
-    @apply p-2 text-lg resize-none w-full;
+    @apply p-2 text-lg  w-full;
+    height: max-content;
   }
 </style>

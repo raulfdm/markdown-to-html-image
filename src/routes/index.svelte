@@ -6,6 +6,9 @@
 
   const { send, state } = useMachine(formMachine);
 
+  let htmlTextArea: HTMLTextAreaElement;
+  let htmlCopied = false;
+
   function getHtml(state) {
     return `<img src="${state.context.url}" alt="${state.context.alt}" ${
       state.context.width ? `width="${state.context.width}"` : ''
@@ -28,6 +31,17 @@
     };
   }
 
+  async function handleCopyHtml() {
+    htmlTextArea.select();
+
+    await navigator.clipboard.writeText(htmlTextArea.value);
+    htmlCopied = true;
+
+    setTimeout(() => {
+      htmlCopied = false;
+    }, 10000);
+  }
+
   $: htmlString = getHtml($state);
 </script>
 
@@ -40,6 +54,7 @@
       <label for="" class="mb-2">Markdown</label>
       <TextArea
         value={$state.context.markdown}
+        rows={2}
         on:focus={handleFocus('FOCUS_MARKDOWN')}
         on:input={handleInput}
         on:blur={handleBlur}
@@ -47,8 +62,46 @@
     </div>
 
     <div class="mt-4">
-      <label for="" class="mb-2">HTML</label>
-      <TextArea value={htmlString} disabled />
+      <div class="relative">
+        <label for="" class="mb-2">HTML</label>
+        <TextArea value={htmlString} readonly bind:ref={htmlTextArea} />
+        <button
+          class={`absolute right-0 bottom-2 px-2 py-2 bg ${htmlCopied ? 'text-green-400' : ''}`}
+          on:click={handleCopyHtml}
+        >
+          {#if htmlCopied}
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-6 w-6"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"
+              />
+            </svg>
+          {:else}
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-6 w-6"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+              />
+            </svg>
+          {/if}
+        </button>
+      </div>
       <div class="mt-4 grid place-items-center">
         <ImagePreview html={htmlString} />
       </div>
@@ -122,9 +175,9 @@
     @apply mb-10;
   }
 
-  textarea:disabled {
+  textarea:read-only {
     background-color: hsl(210deg 8% 18%);
-    @apply cursor-not-allowed;
+    @apply cursor-text;
   }
 
   input,
