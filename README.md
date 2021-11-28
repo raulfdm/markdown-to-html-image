@@ -1,38 +1,44 @@
-# create-svelte
+# Markdown2Html Image online parser
 
-Everything you need to build a Svelte project, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/master/packages/create-svelte);
+> A tiny project to help people convert markdown images to HTML tag
 
-## Creating a project
+## Problem
 
-If you're seeing this, you've probably already done this step. Congrats!
+Despite markdown being popular among devs, non-technical people find it hard to understand its syntax, mainly how it works.
 
-```bash
-# create a new project in the current directory
-npm init svelte@next
+The problem this project solves came from the following support question:
 
-# create a new project in my-app
-npm init svelte@next my-app
+> "How can I define the image size in markdown?"
+
+I noticed that even I explained, the person had never written a single line of HTML, which I ended up parsing the links manually.
+
+## Techs
+
+- [Svelte](https://svelte.dev/) + [Sveltekit](https://kit.svelte.dev/) as JS Framework
+- [xstate](https://xstate.js.org/) for handling finite state machine
+- [TailwindCSS](https://tailwindcss.com/) for styles
+- [Vercel](https://vercel.com/) for hosting
+
+## Running locally
+
+First, ensure you have `pnpm` installed globally. If not, install it via:
+
+```
+npm install -g pnpm
 ```
 
-> Note: the `@next` is temporary
+Then, install the project dependencies:
 
-## Developing
-
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
-
-```bash
-npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
+```
+pnpm install
 ```
 
-## Building
+Finally, run the project:
 
-Before creating a production version of your app, install an [adapter](https://kit.svelte.dev/docs#adapters) for your target environment. Then:
-
-```bash
-npm run build
+```
+pnpm dev
 ```
 
-> You can preview the built app with `npm run preview`, regardless of whether you installed an adapter. This should _not_ be used to serve your app in production.
+## LICENSE
+
+[MIT](./LICENSE)
