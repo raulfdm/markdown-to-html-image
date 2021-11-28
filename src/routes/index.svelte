@@ -1,5 +1,6 @@
 <script lang="ts">
   import TextArea from '$lib/components/TextArea.svelte';
+  import ImagePreview from '$lib/components/ImagePreview.svelte';
   import { useMachine } from '$lib/hooks/useMachine';
   import { formMachine, IFormEvent } from '$lib/store';
 
@@ -48,6 +49,9 @@
     <div class="mt-4">
       <label for="" class="mb-2">HTML</label>
       <TextArea value={htmlString} disabled />
+      <div class="mt-4 grid place-items-center">
+        <ImagePreview html={htmlString} />
+      </div>
     </div>
   </div>
 
@@ -115,7 +119,7 @@
 
   h1 {
     @apply text-4xl md:text-5xl font-bold text-center;
-    @apply mb-12;
+    @apply mb-10;
   }
 
   textarea:disabled {
