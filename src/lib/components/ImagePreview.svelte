@@ -11,7 +11,7 @@
   }
 </script>
 
-<button class="p-2 bg-red-500 rounded-md" on:click={handleOpen}>Preview Image</button>
+<button class="p-2 bg-red-500 rounded-md" on:click={handleOpen}>Image Preview</button>
 
 {#if isOpen}
   <div class="modal">
