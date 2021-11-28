@@ -45,7 +45,7 @@
   $: htmlString = getHtml($state);
 </script>
 
-<main class="container max-w-screen-md mx-auto h-screen">
+<main class="container max-w-screen-md mx-auto h-full">
   <h1>Markdown to HTML Image Parser</h1>
 
   <div class="flex flex-col justify-between">
